@@ -9,12 +9,8 @@ const prompt = require('prompt-sync')({sigint: true});
 
 (async () => {
 
-    if (process.argv.length === 2) {
-        console.error('Expected at least one argument!');
-        process.exit(1);
-    }
+    let user = prompt('Enter a username:\n');
 
-    const user = process.argv[2];
 
     const id = await (async () => {
         const {status, data} = await axios({
@@ -31,15 +27,6 @@ const prompt = require('prompt-sync')({sigint: true});
         });
         return data
     })();
-
-
-    console.log(`USER: ${user}\n\n`);
-    let leagueCount = 0
-    leagues.forEach(league => {
-        leagueCount++
-        league.leagueCount = leagueCount;
-        console.log(league.leagueCount, ` - ${league.name}`);
-    });
 
     // let playerIds = await (async () => {
     //     readline.question(`Enter the number league to get roster\n`, async count => {
@@ -58,6 +45,21 @@ const prompt = require('prompt-sync')({sigint: true});
     //     })
     //     console.log()
     // })();
+
+    makeChoice(user, id, leagues);
+    
+    
+
+})();
+
+const viewRoster = async (user, id, leagues) => {
+    console.log(`USER: ${user}\n\n`);
+    let leagueCount = 0
+    leagues.forEach(league => {
+        leagueCount++
+        league.leagueCount = leagueCount;
+        console.log(league.leagueCount, ` - ${league.name}`);
+    });
 
     let count = prompt(`Enter the number league to get roster\n`);
     let leagueId = leagues.filter(league => {return league.leagueCount === parseInt(count)})[0].league_id;
@@ -91,5 +93,21 @@ const prompt = require('prompt-sync')({sigint: true});
     squad.forEach(x => console.log(x));
     console.log("\n*******Starters:*******\n")
     starters.forEach(x => console.log(x));
+    console.log("\n************************\n\n\n");
+};
 
-})();
+const makeChoice = async (user, id, leagues) => {
+    const options = "\n\n1 - View a roster\n2 - null"
+     let choice = prompt('Choose a function:' + options + "\n");
+     switch(choice) {
+         case "1":
+         await viewRoster(user, id, leagues)
+         break;
+         case "2":
+         console.log("this is null, dickhead")
+         break;
+         default:
+         // code block
+     }
+     makeChoice(user, id, leagues)
+ };
